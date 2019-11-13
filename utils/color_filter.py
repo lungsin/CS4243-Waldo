@@ -41,8 +41,6 @@ def white_filter(image):
 
     return output
 
-    return output_hsv
-
 
 fmap = {
     "red": red_filter,
