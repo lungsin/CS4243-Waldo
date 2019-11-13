@@ -21,7 +21,7 @@ def red_filter(image):
     mask = mask0 + mask1
 
     # set my output img to zero everywhere except my mask
-    output = np.ones(image.shape)
+    output = np.ones((img_hsv.shape[0], img_hsv.shape[1]))
     output[np.where(mask == 0)] = 0
 
     return output
@@ -30,13 +30,13 @@ def red_filter(image):
 def white_filter(image):
     img_hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
 
-    lower_white = np.array([0, 0, 250], dtype=np.uint8)
-    upper_white = np.array([255, 250, 255], dtype=np.uint8)
+    lower_white = np.array([0, 0, 200], dtype=np.uint8)
+    upper_white = np.array([180, 40, 255], dtype=np.uint8)
 
     mask = cv2.inRange(img_hsv, lower_white, upper_white)
 
     # set my output img to zero everywhere except my mask
-    output = np.ones(image.shape)
+    output = np.ones((img_hsv.shape[0], img_hsv.shape[1]))
     output[np.where(mask == 0)] = 0
 
     return output
