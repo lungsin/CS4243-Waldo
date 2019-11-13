@@ -31,7 +31,7 @@ def read_files(dir):
 def to_hog(images):
     hog = cv2.HOGDescriptor()
     gs = [cv2.resize(image, (128, 128)) for image in images]
-    images = [hog.compute(image) for image in gs]
+    images = [hog.compute(image).reshape(-1) for image in gs]
     return images
 
 
@@ -59,15 +59,16 @@ def main():
     print('data collected')
     print('start training SVM')
 
-    X = np.array(X).reshape((len(X), -1))
+    X = np.array(X)
     y = np.array(y)
 
+    print(y)
     print(X.shape, y.shape)
 
     clf = SVC(gamma='auto')
     clf.fit(X, y)
     with open("svc_model.bat", "wb") as f:
-        f.write(pickle.dumps(clf))
+        pickle.dump(clf, f)
 
 
 if __name__ == "__main__":

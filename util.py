@@ -1,5 +1,6 @@
 import cv2
 
+
 def pyramid(image, downscale=1.5, min_size=(30, 30)):
     # yield the original image
     yield image
@@ -20,6 +21,7 @@ def pyramid(image, downscale=1.5, min_size=(30, 30)):
         # yield the next image in the pyramid
         yield image
 
+
 def slidingWindow(image, step, window_size):
     ''' Sliding Window over image - iterable function
 
@@ -34,6 +36,7 @@ def slidingWindow(image, step, window_size):
         for x in range(0, image.shape[1], step):
             # Return current window
             yield (x, y, image[y:y + window_size[1], x:x + window_size[0]])
+
 
 def bb_intersection_over_union(boxA, boxB):
     # determine the (x, y)-coordinates of the intersection rectangle
@@ -57,3 +60,16 @@ def bb_intersection_over_union(boxA, boxB):
 
     # return the intersection over union value
     return iou
+
+
+def splitter(arr, f, size=1000, debug=False):
+    res = []
+    while len(arr) > size:
+        tmp = arr[:size]
+        res.extend(f(tmp))
+        arr = arr[size:]
+        if debug:
+            print(tmp, arr, res)
+
+    res.extend(f(arr))
+    return res
