@@ -17,31 +17,69 @@ def template_matching(image, template, method = cv2.TM_CCOEFF_NORMED, threshold 
         total.append([pt[0], pt[1], pt[0] + w, pt[1] + h])
     
     return np.asarray(total)
-        
-def partial_matching_waldo_pyramid(image, template):
+
+def partial_matching_waldo_pyramid(image, template, threshold=0.375, should_resize=True):
     template = cv2.imread(f"datasets/Features/{template}.jpg")
-    template = resize(template, 128)
+    if should_resize:
+        template = resize(template, 128)
     if image.shape[0] < 6000:
         image = resize(image, 6000)
     
     total = []
     for i in pyramid(image, downscale=1.2, min_size=template.shape): 
-        boxes = template_matching(i, template, threshold=0.375) * (image.shape[0] / i.shape[0])
+        boxes = template_matching(i, template, threshold=threshold) * (image.shape[0] / i.shape[0])
         total.extend(boxes)
     
     total = np.asarray(total)
     total = non_max_suppression_fast(total, 0)
     return total
-    
+
+
+def find_waldo(image):
+    total = []
+    total.extend(partial_matching_waldo_pyramid(image, "waldo_face_eye", 0.5))
+
+    total.extend(partial_matching_waldo_pyramid(image, "027_0", 0.4))
+    total.extend(partial_matching_waldo_pyramid(image, "027_0", 0.4, should_resize=False))
+
+    total.extend(partial_matching_waldo_pyramid(image, "waldo_face_eye"))
+    total.extend(partial_matching_waldo_pyramid(image, "waldo_face_eye", should_resize=False))
+
+    total.extend(partial_matching_waldo_pyramid(image, "000_0", 0.5))
+    total.extend(partial_matching_waldo_pyramid(image, "000_0", 0.5, should_resize=False))
+
+    waldo_body = partial_matching_waldo_pyramid(image, "078_0", 0.3)
+    if len(waldo_body) > 0:
+        waldo_body[:, 1] -= waldo_body[:, 2] - waldo_body[:, 0]
+        waldo_body[:, 3] -= waldo_body[:, 2] - waldo_body[:, 0]
+        total.extend(waldo_body)
+
+    waldo_body = partial_matching_waldo_pyramid(image, "078_0", 0.3, should_resize=False)
+    if len(waldo_body) > 0:
+        waldo_body[:, 1] -= waldo_body[:, 2] - waldo_body[:, 0]
+        waldo_body[:, 3] -= waldo_body[:, 2] - waldo_body[:, 0]
+        total.extend(waldo_body)
+
+    total = np.asarray(total)
+    total = non_max_suppression_fast(total, 0)
+    return total
+
+
+def find_wenda(image):
+    total = []
+    total.extend(partial_matching_waldo_pyramid(image, "wenda", threshold=0.4))
+    total = np.asarray(total)
+    total = non_max_suppression_fast(total, 0)
+    return total
+
+
 if __name__ == "__main__":
     import sys
 
     img = cv2.imread(f"datasets/JPEGImages/{sys.argv[1]}.jpg")
-    # img = cv2.imread(f"cropped_data/positive/waldo/{sys.argv[1]}.jpg")
 
     total = []
-    total.extend(partial_matching_waldo_pyramid(img, "027_0"))
-    total.extend(partial_matching_waldo_pyramid(img, "waldo_face_eye"))
+    total.extend(partial_matching_waldo_pyramid(img, sys.argv[2], 0.45))
     total = np.asarray(total)
     total = non_max_suppression_fast(total, 0)
 

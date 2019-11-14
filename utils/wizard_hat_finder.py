@@ -6,7 +6,7 @@ from utils.pattern_finder import color_with_pyramid
 
 
 def wizard_hat_filter(image):
-    template = cv2.imread(f"../datasets/Features/wizard_hat.jpg")
+    template = cv2.imread(f"datasets/Features/wizard_hat.jpg")
     template = cv2.resize(template, (60, 60))
     template = cv2.cvtColor(template, cv2.COLOR_BGR2GRAY)
 
