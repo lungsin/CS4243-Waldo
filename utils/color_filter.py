@@ -42,9 +42,25 @@ def white_filter(image):
     return output
 
 
+def blue_filter(image):
+    img_hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+
+    lower_blue = np.array([90, 50, 50])
+    upper_blue = np.array([110, 255, 255])
+
+    mask = cv2.inRange(img_hsv, lower_blue, upper_blue)
+
+    # set my output img to zero everywhere except my mask
+    output = np.ones((img_hsv.shape[0], img_hsv.shape[1]))
+    output[np.where(mask == 0)] = 0
+
+    return output
+
+
 fmap = {
     "red": red_filter,
     "white": white_filter,
+    "blue": blue_filter,
 }
 
 if __name__ == "__main__":
