@@ -6,10 +6,14 @@ from utils.pattern_finder import color_with_pyramid
 
 
 def stripes_filter(image):
-    kernel = np.array([0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1]).transpose()
+    kernel = np.array([0, 0, 0, 0,
+                       1, 1, 1, 1,
+                       0, 0, 0, 0,
+                       1, 1, 1, 1,
+                       ]).transpose()
     return color_with_pyramid(image, [red_filter, white_filter], kernel,
                               is_absolute=True,
-                              threshold=9.0,
+                              threshold=12,
                               debug=True,
                               box_size=32
                               )
