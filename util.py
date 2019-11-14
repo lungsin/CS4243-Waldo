@@ -3,7 +3,7 @@ import numpy as np
 
 from matplotlib import pyplot as plt
 
-def pyramid(image, downscale=1.5, min_size=(30, 30)):
+def pyramid(image, downscale=1.2, min_size=(30, 30)):
     # yield the original image
     yield image
 
@@ -17,7 +17,7 @@ def pyramid(image, downscale=1.5, min_size=(30, 30)):
 
         # if the resized image does not meet the supplied minimum
         # size, then stop constructing the pyramid
-        if image.shape[0] < min_size[1] or image.shape[1] < min_size[0]:
+        if image.shape[1] < min_size[1] or image.shape[0] < min_size[0]:
             break
 
         # yield the next image in the pyramid
@@ -145,6 +145,19 @@ def white_filter(image):
     mask = cv2.inRange(img_hsv, (0, 0, 200), (180, 40, 255))
     return mask
 
+def brown_filter(image):
+    img_hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+    mask = cv2.inRange(img_hsv, (10, 10, 40), (50, 255, 100))
+    return mask
+
+def black_filter(image):
+    img_hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+    mask = cv2.inRange(img_hsv, (0, 0, 0), (180, 255, 50))
+    
+    output = np.ones((img_hsv.shape[0], img_hsv.shape[1]))
+    output[np.where(mask == 0)] = 0
+    return output
+    
 def generateEyeFilter(size=(11, 11), r1 = None, r2 = None): 
     if r1 == None and r2 == None: 
         r1 = (size[0] + 1) // 2
@@ -169,3 +182,18 @@ def generateEyeFilter(size=(11, 11), r1 = None, r2 = None):
             if dis <= r1 and dis >= r2:
                 eyeFilter[i, j] = 255
     return eyeFilter
+
+fmap = {
+    "red": red_filter,
+    "white": white_filter,
+    "brown": brown_filter,
+    "black": black_filter,
+}
+
+if __name__ == "__main__":
+    import sys
+    # img = cv2.imread(f"datasets/JPEGImages/{sys.argv[2]}.jpg")
+    img = cv2.imread(f"cropped_data/positive/waldo/{sys.argv[2]}.jpg")
+    img = fmap[sys.argv[1]](img)
+    plt.imshow(img)
+    plt.show()
